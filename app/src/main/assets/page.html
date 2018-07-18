@@ -1,0 +1,51 @@
+<!Doctype html>
+<html xmlns=http://www.w3.org/1999/xhtml>
+<head>
+    <meta http-equiv=Content-Type content="text/html;charset=utf-8">
+    <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1">
+    <title></title>
+    <script src="jquery-1.11.1.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript">
+        window.json = {};
+        function setJson(json) {
+            window.json = json;
+            render(json);
+        }
+
+        function render(json) {
+            var threaddiv = $("#thread");
+
+            var threads = json.threads;
+            for (var x in threads) {
+                var thread = threads[x];
+                add_thread(thread, threaddiv.clone().css({"display": ""}).removeAttr("id"));
+            }
+        }
+
+        function add_thread(thread, div) {
+            $("a", div)
+            //.attr("href", thread.link)
+            .html(thread.title);
+            $("span", div).html(thread.text);
+            div.click(function() {
+                window.location.href = thread.link;
+            });
+            $("#threads").append(div);
+        }
+
+        $().ready(function() {
+        });
+    </script>
+</head>
+<body>
+
+    <div id="threads"></div>
+
+    <div id="thread" class="thread" style="display:none;">
+        <p> &gt;&nbsp; <a href="javascript:void();"></a></p>
+        <span></span>
+    </div>
+    <div style="display:none;"><img alt="我要啦免费统计" src="http://ia.51.la/go1?id=19556535&pvFlag=1" style="border:none" /></div>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">草榴社區</string>
+    <string name="adUnitId">ca-app-pub-8231063758677606/9898844435</string>
+
+    <string name="title_activity_image_view">ImageViewActivity</string>
+    <string name="saveToLocalImage">保存到本地图片</string>
+</resources>

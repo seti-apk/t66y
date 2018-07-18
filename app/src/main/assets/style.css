@@ -1,0 +1,9 @@
+body {
+    background-color:#f9f9ec;
+    margin-bottom: 3em;
+}
+
+.thread {
+    border: solid 1px #d4eff7;
+    padding: 0 0.5em 1em 0.5em;
+}
