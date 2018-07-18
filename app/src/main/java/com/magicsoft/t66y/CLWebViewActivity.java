@@ -89,7 +89,7 @@ public class CLWebViewActivity extends AppCompatActivity
         canvas.drawBitmap(longImage, 0, webView.getMeasuredHeight(), paint);
         webView.draw(canvas);
 
-        
+
     }
 
     void loadUrl(String url) {
