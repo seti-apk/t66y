@@ -4,4 +4,5 @@
 
     <string name="title_activity_image_view">ImageViewActivity</string>
     <string name="saveToLocalImage">保存到本地图片</string>
+    <string name="title_activity_entry">EntryActivity</string>
 </resources>

@@ -16,15 +16,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        final String HOMEPAGE = CLPage.HOSTNAME + "index.php";
+//        final String HOMEPAGE = CLPage.HOSTNAME + "index.php";
         MobileAds.initialize(this, "ca-app-pub-8231063758677606/9898844435");
 
-//*
+/*
         Intent intent = new Intent(this, CLWebViewActivity.class);
         intent.putExtra("url", HOMEPAGE);
 /*/
-        Intent intent = new Intent(this, ImageViewActivity.class);
-        intent.putExtra("src", CLPage.HOSTNAME);
+        Intent intent = new Intent(this, EntryActivity.class);
+//        intent.putExtra("src", CLPage.HOSTNAME);
 //*/
         startActivity(intent);
         finish();

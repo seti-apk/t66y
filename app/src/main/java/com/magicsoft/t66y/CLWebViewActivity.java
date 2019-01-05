@@ -3,8 +3,6 @@ package com.magicsoft.t66y;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
@@ -13,22 +11,23 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View.MeasureSpec;
 import android.webkit.JavascriptInterface;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.magicsoft.t66y.page.CLPage;
+import com.magicsoft.t66y.util.WebViewSaveHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CLWebViewActivity extends AppCompatActivity
-        implements CLPage.PageLoadDelegate{
+        implements CLPage.PageLoadDelegate, WebViewSaveHelper.Delegate {
 
     private CLWebViewActivity ui = this;
     private JSONObject json;
@@ -41,15 +40,13 @@ public class CLWebViewActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clweb_view);
 
-        Log.e("ACT", String.valueOf(this.getTaskId()));
-        Log.e("ACT", String.valueOf(this.hashCode()));
         Intent intent = getIntent();
         final String url = intent.getStringExtra("url");
         Log.w("url", url);
 
         webView = findViewById(R.id.webView);
         initWebView(webView);
-//        loadUrl(url);
+        loadUrl(url);
 
         AdView adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
@@ -69,27 +66,10 @@ public class CLWebViewActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem menu) {
         switch (menu.getItemId()) {
             case R.id.save:
-                saveWebviewToLocalImage();
+                WebViewSaveHelper.saveWebViewToLocalImage(webView, this, this);
                 break;
         }
         return true;
-    }
-
-    void saveWebviewToLocalImage() {
-        webView.measure(MeasureSpec.makeMeasureSpec(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED),
-                MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-        webView.layout(0, 0, webView.getMeasuredWidth(), webView.getMeasuredHeight());
-        webView.setDrawingCacheEnabled(true);
-        webView.buildDrawingCache();
-        Bitmap longImage = Bitmap.createBitmap(webView.getMeasuredWidth(),
-                webView.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
-
-        Canvas canvas = new Canvas(longImage);  // 画布的宽高和 WebView 的网页保持一致
-        Paint paint = new Paint();
-        canvas.drawBitmap(longImage, 0, webView.getMeasuredHeight(), paint);
-        webView.draw(canvas);
-
-
     }
 
     void loadUrl(String url) {
@@ -103,7 +83,7 @@ public class CLWebViewActivity extends AppCompatActivity
             finish();
         }
     }
-
+/*
     @Override
     protected void onStop() {
         super.onStop();
@@ -128,7 +108,7 @@ public class CLWebViewActivity extends AppCompatActivity
         super.onStart();
         Log.e("activity", "active start" + this.hashCode());
     }
-
+//*/
     @Override
     public void pageLoaded(JSONObject json) {
         this.json = json;
@@ -149,6 +129,16 @@ public class CLWebViewActivity extends AppCompatActivity
         webView.setWebViewClient(webViewClient);
 
         webView.addJavascriptInterface(new JSInterface(), "jsi");
+    }
+
+    @Override
+    public void saveWebViewSuccess(String fileName) {
+        Toast.makeText(this, "Saved!", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void saveWebViewFailed() {
+        Toast.makeText(this, "Save Failed", Toast.LENGTH_SHORT).show();
     }
 
     public class JSInterface {

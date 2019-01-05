@@ -3,6 +3,7 @@ package com.magicsoft.t66y.page;
 import android.content.Context;
 import android.util.Log;
 
+import com.magicsoft.t66y.EntryActivity;
 import com.magicsoft.t66y.http.URLParser;
 import com.magicsoft.t66y.util.Regex;
 
@@ -63,7 +64,7 @@ public class CLThreadPage extends CLPage {
             JSONArray reads = new JSONArray();
             while (m.find()) {
                 JSONObject read = new JSONObject();
-                read.put("link", HOSTNAME + m.group(1));
+                read.put("link", EntryActivity.DomainName + m.group(1));
                 read.put("title", m.group(2));
                 reads.put(read);
             }

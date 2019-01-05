@@ -2,6 +2,7 @@ package com.magicsoft.t66y.page;
 
 import android.content.Context;
 
+import com.magicsoft.t66y.EntryActivity;
 import com.magicsoft.t66y.util.Regex;
 
 import org.json.JSONArray;
@@ -31,7 +32,7 @@ public class CLIndexPage extends CLPage {
             JSONArray threads = new JSONArray();
             while (m.find()) {
                 JSONObject thread = new JSONObject();
-                thread.put("link", HOSTNAME + m.group(1));
+                thread.put("link", EntryActivity.DomainName + m.group(1));
                 thread.put("title", m.group(2));
                 thread.put("text", m.group(3));
                 threads.put(thread);

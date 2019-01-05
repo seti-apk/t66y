@@ -13,7 +13,7 @@ import java.net.URISyntaxException;
 
 public abstract class CLPage extends Object {
 
-    public static final String HOSTNAME = "https://cl.0qc.info/";
+//    public static final String HOSTNAME = "https://bb.o5b.club/";
 
     protected String url;
     private Context context;
