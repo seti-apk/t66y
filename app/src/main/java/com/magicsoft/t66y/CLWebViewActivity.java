@@ -83,32 +83,7 @@ public class CLWebViewActivity extends AppCompatActivity
             finish();
         }
     }
-/*
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.e("activity","active stop" + this.hashCode());
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.e("activity", "active resume" + this.hashCode());
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.e("activity", "active destroy" + this.hashCode());
-        webView.stopLoading();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.e("activity", "active start" + this.hashCode());
-    }
-//*/
     @Override
     public void pageLoaded(JSONObject json) {
         this.json = json;

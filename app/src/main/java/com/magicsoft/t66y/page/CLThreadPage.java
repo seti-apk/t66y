@@ -64,7 +64,7 @@ public class CLThreadPage extends CLPage {
             JSONArray reads = new JSONArray();
             while (m.find()) {
                 JSONObject read = new JSONObject();
-                read.put("link", EntryActivity.DomainName + m.group(1));
+                read.put("link", EntryActivity.DomainName() + m.group(1));
                 read.put("title", m.group(2));
                 reads.put(read);
             }
@@ -74,26 +74,7 @@ public class CLThreadPage extends CLPage {
         }
 
     }
-/*
-    @Override
-    public JSONObject loadPage() {
-        JSONObject json = new JSONObject();
-        try {
-            InputStream is = context.getAssets().open("html/thread.html");
-            int size = is.available();
-            // Read the entire asset into a local byte buffer.
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
-            // Convert the buffer into a string.
-            String response = new String(buffer, "gbk");
-            jsonParse(response, json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return json;
-    }
-//*/
+
     @Override
     public String template() {
         return "file:///android_asset/thread.html";

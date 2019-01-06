@@ -11,7 +11,7 @@ import android.widget.Button;
 
 public class EntryActivity extends AppCompatActivity {
 
-    public static String DomainName = "";
+    private static String DomainName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,8 +29,16 @@ public class EntryActivity extends AppCompatActivity {
 
                 String domainName = txt.getText().toString();
                 saveDomain(domainName);
+                if (!domainName.toLowerCase().startsWith("https://")) {
+                    domainName = "https://".concat(domainName);
+                }
+                if (!domainName.endsWith("/")) {
+                    domainName = domainName.concat("/");
+                }
+                DomainName = domainName;
 
-                String HOMEPAGE = "https://" + domainName + "/index.php";
+
+                String HOMEPAGE = domainName + "index.php";
                 Log.e("entry", HOMEPAGE);
                 Intent intent = new Intent(EntryActivity.this,
                         CLWebViewActivity.class);
@@ -39,6 +47,10 @@ public class EntryActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    public static String DomainName() {
+        return DomainName;
     }
 
     public boolean saveDomain(String domainName) {

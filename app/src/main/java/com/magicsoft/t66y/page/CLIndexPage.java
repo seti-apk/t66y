@@ -32,7 +32,7 @@ public class CLIndexPage extends CLPage {
             JSONArray threads = new JSONArray();
             while (m.find()) {
                 JSONObject thread = new JSONObject();
-                thread.put("link", EntryActivity.DomainName + m.group(1));
+                thread.put("link", EntryActivity.DomainName() + m.group(1));
                 thread.put("title", m.group(2));
                 thread.put("text", m.group(3));
                 threads.put(thread);
@@ -42,26 +42,7 @@ public class CLIndexPage extends CLPage {
             e.printStackTrace();
         }
     }
-    /*
-        @Override
-        public JSONObject loadPage() {
-            JSONObject json = new JSONObject();
-            try {
-                InputStream is = context.getAssets().open("html/index.html");
-                int size = is.available();
-                // Read the entire asset into a local byte buffer.
-                byte[] buffer = new byte[size];
-                is.read(buffer);
-                is.close();
-                // Convert the buffer into a string.
-                String response = new String(buffer, "gbk");
-                jsonParse(response, json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return json;
-        }
-    //*/
+
     @Override
     public String template() {
         return "file:///android_asset/page.html";
