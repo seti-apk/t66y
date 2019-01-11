@@ -58,17 +58,23 @@ public abstract class CLPage extends Object {
     }
 
     public void loadPage(final PageLoadDelegate delegate) {
-
-        HttpRequest.httpGet(this.url, new HttpRequest.HttpDelegate() {
-
+        final String url = this.url;
+        new Thread(new Runnable() {
             @Override
-            public void httpRequestDidReceived(String response) {
-                final JSONObject json = new JSONObject();
-                jsonParse(response, json);
-                Log.e("JSON", json.toString());
-                delegate.pageLoaded(json);
+            public void run() {
+                HttpRequest.httpGet(url, new HttpRequest.HttpDelegate() {
+
+                    @Override
+                    public void httpRequestDidReceived(String response) {
+                        final JSONObject json = new JSONObject();
+                        jsonParse(response, json);
+                        Log.e("JSON", json.toString());
+                        delegate.pageLoaded(json);
+                    }
+                }, "gbk");
+
             }
-        }, "gbk");
+        }).start();
 
     }
 

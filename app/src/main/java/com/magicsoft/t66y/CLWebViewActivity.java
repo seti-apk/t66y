@@ -40,19 +40,26 @@ public class CLWebViewActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clweb_view);
 
-        Intent intent = getIntent();
-        final String url = intent.getStringExtra("url");
-        Log.w("url", url);
-
         webView = findViewById(R.id.webView);
         initWebView(webView);
-        loadUrl(url);
 
         AdView adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         adView.loadAd(adRequest);
+    }
+
+    protected void onStart() {
+        super.onStart();
+
+        Intent intent = getIntent();
+        final String url = intent.getStringExtra("url");
+        Log.w("url", url);
+
+        if (!jsonLoaded) {
+            loadUrl(url);
+        }
     }
 
     @Override

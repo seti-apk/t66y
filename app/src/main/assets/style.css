@@ -1,6 +1,9 @@
 body {
     background-color:#f9f9ec;
     margin-bottom: 3em;
+    font-family:Tahoma;
+    width: 95%;
+    overflow: hidden;
 }
 
 .thread {
