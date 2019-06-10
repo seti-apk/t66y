@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -27,13 +29,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class CLWebViewActivity extends AppCompatActivity
-        implements CLPage.PageLoadDelegate, WebViewSaveHelper.Delegate {
+        implements WebViewSaveHelper.Delegate {
+
+    private static final String TAG = "CLWebViewActivity";
 
     private CLWebViewActivity ui = this;
-    private JSONObject json;
-    boolean jsonLoaded = false;
+    boolean isTemplateReady = false;
     private WebView webView;
-    private CLPage page;
+    public CLPage page;
+    boolean isFinished = false;
+    boolean isWaiting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,29 +47,21 @@ public class CLWebViewActivity extends AppCompatActivity
 
         webView = findViewById(R.id.webView);
         initWebView(webView);
-
+//*
         AdView adView = findViewById(R.id.adView);
         AdRequest adRequest = new AdRequest.Builder()
-                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+//                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
         adView.loadAd(adRequest);
-    }
-
-    protected void onStart() {
-        super.onStart();
-
+//*/
         Intent intent = getIntent();
         final String url = intent.getStringExtra("url");
         Log.w("url", url);
-
-        if (!jsonLoaded) {
-            loadUrl(url);
-        }
+        loadPage(url);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
@@ -79,24 +76,42 @@ public class CLWebViewActivity extends AppCompatActivity
         return true;
     }
 
-    void loadUrl(String url) {
+    public synchronized void setTemplateReady(boolean templateReady) {
+        isTemplateReady = templateReady;
+    }
+
+    void loadPage(String url) {
+        setTemplateReady(false);
         try {
-            jsonLoaded = false;
             page = CLPage.pageFromUrl(url, this);
             webView.loadUrl(page.template());
-            page.loadPage(this);
         } catch (CLPage.PageClassNotExistsException e) {
             e.printStackTrace();
             finish();
         }
     }
 
-    @Override
-    public void pageLoaded(JSONObject json) {
-        this.json = json;
-        jsonLoaded = true;
-        synchronized (webViewClient) {
-            webViewClient.notifyAll();
+    long pageTime = 0;
+
+    public void pageLoaded(final JSONObject json) {
+        Log.d(TAG, "pageLoaded: time spend=" + (System.currentTimeMillis() - pageTime));
+//        if (!isTemplateReady) {
+//            Log.d(TAG, "pageLoaded: wait");
+//                isWaiting = true;
+//                webView.wait();
+//                isWaiting = false;
+//            Log.d(TAG, "pageLoaded: notified, continue");
+//        }
+        try {
+            String title = json.getString("title");
+            title = title.replace("&nbsp;", " ");
+            ui.setTitle(title);
+            webView.loadUrl("javascript:setJson("
+                    + json.toString()
+                    + ")");
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
     }
 
@@ -134,41 +149,24 @@ public class CLWebViewActivity extends AppCompatActivity
     }
 
     final WebViewClient webViewClient = new WebViewClient() {
-
+        long start = 0;
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
+            start = System.currentTimeMillis();
             super.onPageStarted(view, url, favicon);
-            ui.setTitle("加载中……");
+            ui.setTitle("Loading...");
         }
 
         @Override
         public void onPageFinished(WebView view, String url) {
+            Log.d(TAG, "onPageFinished: time spend=" + (System.currentTimeMillis() - start));
             super.onPageFinished(view, url);
-            synchronized (this) {
-                try {
-                    if (!jsonLoaded) {
-                        this.wait();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            Log.d("PAGE FINISHED JSON", ui.json.toString());
-            try {
-                String title = ui.json.getString("title");
-                title = title.replace("&nbsp;", " ");
-                ui.setTitle(title);
-                view.loadUrl("javascript:setJson("
-                        + ui.json.toString()
-                        + ")");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            pageTime = System.currentTimeMillis();
+            page.loadPage(handler);
         }
 
         @Override
-        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error){
+        public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
             handler.proceed(); // 接受网站证书
         }
 
@@ -179,7 +177,7 @@ public class CLWebViewActivity extends AppCompatActivity
                 CLPage page = CLPage.pageFromUrl(url, null);
                 if (page.same(ui.page)) {
                     Log.e("PAGE", "equals");
-                    loadUrl(url);
+                    loadPage(url);
                     return true;
                 }
             } catch (CLPage.PageClassNotExistsException e) {
@@ -197,5 +195,58 @@ public class CLWebViewActivity extends AppCompatActivity
             return true;
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        isFinished = true;
+    }
+
+//    static class MyHandler extends Handler {
+//        WeakReference<CLWebViewActivity> ref;
+//
+//        MyHandler(CLWebViewActivity activity) {
+//            ref = new WeakReference<>(activity);
+//        }
+//
+//        @Override
+//        public void handleMessage(Message msg) {
+//            super.handleMessage(msg);
+//            CLWebViewActivity activity = ref.get();
+//            if (activity == null) return;
+//            if (activity.isFinished) return;
+//            switch (msg.what) {
+//                case CLPage.MSG_HTTP_RESPONSE:
+//                    JSONObject jsonObject = (JSONObject) msg.obj;
+//                    activity.pageLoaded(jsonObject);
+//                    break;
+//                case CLPage.MSG_HTTP_REQUEST_FAILED:
+//                    activity.page.loadPage(activity.handler); // retry
+//                    Log.d(TAG, "handleMessage: failed");
+//                    break;
+//            }
+//        }
+//    }
+
+    //    MyHandler handler = new MyHandler(CLWebViewActivity.this);
+    Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Log.d(TAG, "handleMessage: current thread=" + Thread.currentThread().getId());
+            switch (msg.what) {
+                case CLPage.MSG_HTTP_RESPONSE:
+                    JSONObject jsonObject = (JSONObject) msg.obj;
+                    pageLoaded(jsonObject);
+                    break;
+                case CLPage.MSG_HTTP_REQUEST_FAILED:
+                    page.loadPage(handler); // retry
+                    Log.d(TAG, "handleMessage: failed");
+                    break;
+            }
+            return true;
+        }
+    });
+
 
 }

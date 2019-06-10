@@ -29,8 +29,8 @@ public class EntryActivity extends AppCompatActivity {
 
                 String domainName = txt.getText().toString();
                 saveDomain(domainName);
-                if (!domainName.toLowerCase().startsWith("https://")) {
-                    domainName = "https://".concat(domainName);
+                if (!domainName.toLowerCase().startsWith("http://")) {
+                    domainName = "http://".concat(domainName);
                 }
                 if (!domainName.endsWith("/")) {
                     domainName = domainName.concat("/");

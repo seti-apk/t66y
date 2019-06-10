@@ -1,5 +1,7 @@
 package com.magicsoft.t66y.http;
 
+import android.os.Handler;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +11,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 public class HttpRequest {
+
+    public final static int DATA_ARRIVED = 1;
 
     public interface HttpDelegate {
         void httpRequestDidReceived(String response);
@@ -31,7 +35,7 @@ public class HttpRequest {
                         HttpURLConnection conn;
 
                         try {
-                            conn = (HttpURLConnection)_url.openConnection();
+                            conn = (HttpURLConnection) _url.openConnection();
                             conn.setConnectTimeout(3000);
                             conn.setDoInput(true);
                             conn.setRequestMethod("GET");
@@ -59,4 +63,29 @@ public class HttpRequest {
         ).start();
     }
 
+    public static String httpGet(final URL url,
+                                 final String charsetName) throws IOException {
+        HttpURLConnection conn;
+
+        conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(3000);
+        conn.setDoInput(true);
+        conn.setRequestMethod("GET");
+        InputStream is = conn.getInputStream();
+        InputStreamReader reader = new InputStreamReader(is, charsetName);
+
+        BufferedReader bufferedReader = new BufferedReader(reader);
+        StringBuffer buffer = new StringBuffer();
+        String temp;
+
+        while ((temp = bufferedReader.readLine()) != null) {
+            //取水--如果不为空就一直取
+            buffer.append(temp);
+        }
+        bufferedReader.close();
+        reader.close();
+        is.close();
+        conn.disconnect();
+        return buffer.toString();
+    }
 }

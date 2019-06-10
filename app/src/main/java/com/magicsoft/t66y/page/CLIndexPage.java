@@ -18,6 +18,11 @@ public class CLIndexPage extends CLPage {
     }
 
     @Override
+    protected String url() {
+        return url;
+    }
+
+    @Override
     void jsonParse(String response, JSONObject json) {
         String title = Regex.match_one("<title>(.*?)</title>", response, 1);
         String pattern;

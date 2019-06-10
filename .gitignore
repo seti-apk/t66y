@@ -4,9 +4,10 @@
 /.idea/libraries
 /.idea/modules.xml
 /.idea/workspace.xml
-.DS_Store
+*.DS_Store
 /build
 /release
 /captures
+/app/release/*.apk
 .externalNativeBuild
 *.apk
